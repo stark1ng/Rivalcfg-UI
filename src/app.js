@@ -26,6 +26,7 @@ const UI = {
     profile_loaded: "Profile \"{name}\" loaded", profile_n: "Profile {n}",
     status_searching: "Searching for mouse…", status_none: "No mouse found",
     status_none_sub: "connect a mouse", pick_hint: "The current model is highlighted. You can browse another model's settings, but they can only be applied to the connected mouse.",
+    language: "Language",
     search_ph: "Search model…", devices_title: "Devices",
     devices_sub_none: "Connect a mouse or pick a model manually",
     group_dpi: "DPI AND POLLING", group_light: "LIGHTING", group_power: "POWER",
@@ -53,6 +54,7 @@ const UI = {
     profile_loaded: "Профиль «{name}» загружен", profile_n: "Профиль {n}",
     status_searching: "Поиск мыши…", status_none: "Мышь не найдена",
     status_none_sub: "подключите мышь", pick_hint: "Текущая модель выделена. Можно посмотреть настройки другой модели, но применять можно только к подключённой.",
+    language: "Язык",
     search_ph: "Поиск модели…", devices_title: "Устройства",
     devices_sub_none: "Подключите мышь или выберите модель вручную",
     group_dpi: "DPI И ОПРОС", group_light: "ПОДСВЕТКА", group_power: "ПИТАНИЕ",
@@ -857,6 +859,7 @@ function loadProfile(name) {
 function translateStatic() {
   document.documentElement.lang = lang;
   $("profiles-label").textContent = t("profiles");
+  $("lang-label").textContent = t("language");
   $("profile-save").textContent = t("save");
   $("profile-delete").textContent = t("deletebt");
   $("btn-docs").textContent = t("docs");
@@ -868,8 +871,23 @@ function translateStatic() {
 }
 
 function initLang() {
+  translateStatic();
   const sel = $("lang-select");
   sel.value = lang;
+  const pop = $("settings-pop");
+  const toggle = $("settings-toggle");
+  toggle.addEventListener("click", (ev) => {
+    ev.stopPropagation();
+    pop.classList.toggle("open");
+  });
+  document.addEventListener("click", (ev) => {
+    if (pop.classList.contains("open") && !pop.contains(ev.target)) {
+      pop.classList.remove("open");
+    }
+  });
+  document.addEventListener("keydown", (ev) => {
+    if (ev.key === "Escape") pop.classList.remove("open");
+  });
   sel.addEventListener("change", () => {
     lang = sel.value;
     localStorage.setItem("lang", lang);
