@@ -74,7 +74,7 @@ function createWindow() {
   win.loadFile(path.join(__dirname, "src", "index.html"));
   setTimeout(() => {
     win.webContents.executeJavaScript(
-      "(async () => { selectPage('devices'); await new Promise(r => setTimeout(r, 120)); const items = document.querySelectorAll('.device-item').length; selectPage('light'); await new Promise(r => setTimeout(r, 120)); const rows = document.querySelectorAll('.row').length; const active = (document.querySelector('.nav-item.active') || {}).textContent || '?'; return JSON.stringify({items, lightRows: rows, active}); })()"
+      "(async () => { const out = {}; const main = document.querySelector('.main'); const order = ['dpi','light','power','buttons']; for (const p of order) { selectPage(p); await new Promise(r => setTimeout(r, 80)); out[p] = main.scrollHeight - main.clientHeight; } selectPage('dpi'); return JSON.stringify(out); })()"
     ).then((r) => console.log("[probe]", r)).catch((e) => console.error("[probe-err]", String(e)));
   }, 6000);
   return win;
