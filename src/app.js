@@ -28,6 +28,23 @@ const RU = {
   speed: "Скорость",
 };
 
+const RU_DESC = {
+  sensitivity: "До пяти предустановок, переключаются кнопкой смены DPI на мыши",
+  polling_rate: "Как часто мышь отправляет данные компьютеру",
+  z1_color: "Цвет верхней зоны подсветки",
+  z2_color: "Цвет средней зоны подсветки",
+  z3_color: "Цвет нижней зоны подсветки",
+  z4_color: "Цвет зоны логотипа",
+  logo_color: "Цвет зоны логотипа",
+  reactive_color: "Цвет подсветки при нажатии кнопок",
+  sleep_timer: "Время бездействия до перехода мыши в сон, минут (0 - выключить)",
+  dim_timer: "Время бездействия до затемнения подсветки, секунд (0 - выключить)",
+  buttons_mapping: "Переназначение кнопок и колеса мыши",
+  rainbow_effect: "Постоянный радужный эффект подсветки",
+  default_lighting: "Режим подсветки при подключении мыши",
+  light_effect: "Эффект анимации подсветки",
+};
+
 const GROUPS = [
   { id: "dpi", title: "DPI и опрос", match: ["sensitivity", "polling_rate"] },
   { id: "light", title: "Подсветка", match: ["color", "light", "rainbow", "gradient", "reactive", "logo", "strip", "z1", "z2", "z3", "z4"] },
@@ -203,6 +220,11 @@ function labelFor(entry, key, schema) {
   return schema.label || key.replace(/_/g, " ");
 }
 
+function descFor(key, schema) {
+  if (RU_DESC[key]) return RU_DESC[key];
+  return null; // английские описания профилей не показываем
+}
+
 function render(entry) {
   const root = $("settings");
   root.innerHTML = "";
@@ -269,38 +291,38 @@ function rowWrap(label, desc) {
 function renderRow(entry, key, schema) {
   const t = schema.value_type;
   const label = labelFor(entry, key, schema);
-  const row = rowWrap(label, schema.description && schema.description !== label ? schema.description : "");
+  const row = rowWrap(label, descFor(key, schema) || "");
   const ctrl = document.createElement("div");
   ctrl.className = "row-control";
 
   if (t === "choice") {
     ctrl.appendChild(segmented(schema.choices, EFFECT_LABELS, state.values[key], (val) => {
       state.values[key] = val;
-      updateButtons();
+      userChanged();
     }));
   } else if (t === "range") {
     ctrl.appendChild(rangeControl(schema, state.values[key], (val) => {
       state.values[key] = val;
-      updateButtons();
+      userChanged();
     }));
   } else if (t === "rgbcolor") {
     ctrl.appendChild(colorControl(state.values[key], (hex) => {
       state.values[key] = hex;
-      updateButtons();
+      userChanged();
     }));
   } else if (t === "reactive_rgbcolor") {
     ctrl.appendChild(reactiveControl(state.values[key], (val) => {
       state.values[key] = val;
-      updateButtons();
+      userChanged();
     }));
   } else if (t === "multidpi_range_choice" || t === "multidpi_range") {
-    ctrl.appendChild(dpiEditor(schema, state.values[key], () => updateButtons()));
+    ctrl.appendChild(dpiEditor(schema, state.values[key], userChanged));
   } else if (t === "buttons") {
-    ctrl.appendChild(buttonsEditor(schema, state.values[key], () => updateButtons()));
+    ctrl.appendChild(buttonsEditor(schema, state.values[key], userChanged));
   } else if (t === "none") {
     ctrl.appendChild(toggleControl(state.values[key], (val) => {
       state.values[key] = val;
-      updateButtons();
+      userChanged();
     }));
   }
   row.appendChild(ctrl);
@@ -429,18 +451,26 @@ function buttonsEditor(schema, map, onChange) {
     button1: "ЛКМ", button2: "ПКМ", button3: "СКМ",
     button4: "Назад", button5: "Вперёд", button6: "Кнопка 6",
     button7: "Кнопка 7", button8: "Кнопка 8", button9: "Кнопка 9",
-    scrollup: "Колесо вверх", scrolldown: "Колесо вниз", dpi: "Смена DPI",
+    scrollup: "Колесо вверх", scrolldown: "Колесо вниз",
     disabled: "Отключена",
   };
-  const displayNames = { button1: "ЛКМ", button2: "ПКМ", button3: "СКМ", button4: "Назад", button5: "Вперёд", button6: "Кнопка 6", button7: "Кнопка 7", button8: "Кнопка 8", button9: "Кнопка 9", scrollup: "Колесо ↑", scrolldown: "Колесо ↓" };
+  const physNames = {
+    button1: "Левая кнопка", button2: "Правая кнопка", button3: "Средняя кнопка",
+    button4: "Назад", button5: "Вперёд", button6: "Боковая 6",
+    button7: "Боковая 7", button8: "Боковая 8", button9: "Боковая 9",
+    scrollup: "Колесо вверх", scrolldown: "Колесо вниз",
+  };
+  const opts = ["button1", "button2", "button3", "button4", "button5", "button6", "button7", "button8", "button9", "scrollup", "scrolldown", "dpi", "disabled"];
   const wrap = document.createElement("div");
   wrap.className = "buttons-grid";
-  for (const [phys, action] of Object.entries(map)) {
-    const lab = document.createElement("label");
-    lab.textContent = displayNames[phys] || phys;
+  Object.entries(map).forEach(([phys, action], i, arr) => {
+    const row = document.createElement("div");
+    row.className = "buttons-row";
+    const lab = document.createElement("span");
+    lab.className = "b-name";
+    lab.textContent = physNames[phys] || phys;
     const sel = document.createElement("select");
     sel.className = "select";
-    const opts = ["button1", "button2", "button3", "button4", "button5", "button6", "scrollup", "scrolldown", "dpi", "disabled"];
     for (const o of opts) {
       const op = document.createElement("option");
       op.value = o;
@@ -452,9 +482,9 @@ function buttonsEditor(schema, map, onChange) {
       map[phys] = sel.value;
       onChange();
     });
-    lab.appendChild(sel);
-    wrap.appendChild(lab);
-  }
+    row.append(lab, sel);
+    wrap.appendChild(row);
+  });
   return wrap;
 }
 
@@ -481,6 +511,11 @@ function updateButtons() {
   $("btn-revert").disabled = !dirty;
 }
 
+function userChanged() {
+  updateButtons();
+  if ($("auto-apply").checked && state.device && isDirty(state.device)) apply();
+}
+
 async function apply() {
   if (!state.device) return;
   const args = buildArgs(state.device);
@@ -490,11 +525,12 @@ async function apply() {
   const res = await bridge({ op: "run", args });
   $("btn-apply").textContent = "Применить";
   if (res.ok) {
+    const n = args.filter((a) => a.startsWith("--") || a.startsWith("-")).length;
     state.clean = JSON.parse(JSON.stringify(state.values));
-    toast("Применено", "ok");
+    toast("Применено к мыши: " + n + " параметров", "ok");
   } else {
-    const detail = (res.stderr || res.error || "").split("\n").slice(-3).join(" ").trim();
-    toast("Ошибка: " + detail, "err");
+    const detail = (res.stderr || res.error || "").split("\n").slice(-2).join(" ").trim();
+    toast("Ошибка применения: " + detail, "err");
   }
   updateButtons();
 }
