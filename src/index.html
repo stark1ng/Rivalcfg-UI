@@ -28,7 +28,7 @@
     <section class="side-card side-card-click" id="device-status" role="button" tabindex="0" title="Перейти к выбору устройства">
       <div class="status-dot" id="status-dot"></div>
       <div class="status-text">
-        <div class="status-title" id="status-name">Поиск мыши…</div>
+        <div class="status-title" id="status-name">Searching…</div>
         <div class="status-sub" id="status-id">&nbsp;</div>
       </div>
     </section>
@@ -36,11 +36,17 @@
     <nav class="side-nav" id="side-nav" aria-label="Разделы настроек"></nav>
 
     <section class="side-section side-section-bottom">
-      <div class="side-label">Профили</div>
+      <div class="side-section-row">
+        <div class="side-label" id="profiles-label">Profiles</div>
+        <select class="select select-inline" id="lang-select" title="Language / Язык">
+          <option value="en">EN</option>
+          <option value="ru">RU</option>
+        </select>
+      </div>
       <select class="select" id="profile-select"><option value="">—</option></select>
       <div class="side-actions">
-        <button class="btn" id="profile-save" type="button">Сохранить</button>
-        <button class="btn btn-danger" id="profile-delete" type="button">Удалить</button>
+        <button class="btn" id="profile-save" type="button">Save</button>
+        <button class="btn btn-danger" id="profile-delete" type="button">Delete</button>
       </div>
     </section>
   </aside>
@@ -48,17 +54,17 @@
   <main class="main">
     <header class="topbar">
       <div>
-        <h1 class="page-title" id="page-title">Устройства</h1>
+        <h1 class="page-title" id="page-title">Devices</h1>
         <div class="page-sub" id="page-sub">&nbsp;</div>
       </div>
       <div class="topbar-actions">
-        <a class="btn" id="btn-docs" href="#" hidden target="_blank" rel="noreferrer">Документация</a>
-        <label class="auto-apply" title="Применять каждое изменение сразу">
+        <a class="btn" id="btn-docs" href="#" hidden target="_blank" rel="noreferrer">Docs</a>
+        <label class="auto-apply" title="Apply every change immediately">
           <input type="checkbox" id="auto-apply" checked />
-          <span>Авто-применение</span>
+          <span>Auto-apply</span>
         </label>
-        <button class="btn" id="btn-revert" type="button" disabled>Отменить</button>
-        <button class="btn btn-primary" id="btn-apply" type="button" disabled>Применить</button>
+        <button class="btn" id="btn-revert" type="button" disabled>Revert</button>
+        <button class="btn btn-primary" id="btn-apply" type="button" disabled>Apply</button>
       </div>
     </header>
 

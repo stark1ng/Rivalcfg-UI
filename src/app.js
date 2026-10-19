@@ -9,7 +9,72 @@ const NAMED_COLORS = {
   disable: "#000000", none: "#000000",
 };
 
-const RU = {
+/* ---------- i18n ---------- */
+
+let lang = localStorage.getItem("lang") || "en";
+
+function t(key) {
+  return UI[lang][key] !== undefined ? UI[lang][key] : UI.en[key] !== undefined ? UI.en[key] : key;
+}
+
+const UI = {
+  en: {
+    save: "Save", deletebt: "Delete", profiles: "Profiles", docs: "Docs",
+    revert: "Revert", apply: "Apply", applying: "Applying…", auto_apply: "Auto-apply",
+    applied: "Applied to mouse: {n} parameters", err_apply: "Apply failed: ",
+    profile_saved: "Profile \"{name}\" saved", profile_deleted: "Profile \"{name}\" deleted",
+    profile_loaded: "Profile \"{name}\" loaded", profile_n: "Profile {n}",
+    status_searching: "Searching for mouse…", status_none: "No mouse found",
+    status_none_sub: "connect a mouse", pick_hint: "The current model is highlighted. You can browse another model's settings, but they can only be applied to the connected mouse.",
+    search_ph: "Search model…", devices_title: "Devices",
+    devices_sub_none: "Connect a mouse or pick a model manually",
+    group_dpi: "DPI AND POLLING", group_light: "LIGHTING", group_power: "POWER",
+    group_buttons: "BUTTONS", group_other: "OTHER",
+    nav_devices: "Device", nav_dpi: "DPI & polling", nav_light: "Lighting",
+    nav_power: "Power", nav_buttons: "Buttons", nav_other: "Other",
+    preset: "Preset {n}", off_label: "off", unit_min: " min", unit_sec: " s",
+    effect_steady: "Steady", effect_breath: "Breath", effect_breath_slow: "Breath (slow)",
+    effect_breath_fast: "Breath (fast)", effect_rainbow_shift: "Rainbow (shift)",
+    effect_rainbow_breath: "Rainbow (pulse)", effect_disco: "Disco",
+    effect_reactive: "Reactive", effect_rainbow: "Rainbow",
+    effect_reactive_rainbow: "Reactive rainbow", effect_off: "Off",
+    btn_left: "Left button", btn_right: "Right button", btn_middle: "Middle button",
+    btn_back: "Back", btn_forward: "Forward", btn_side6: "Side 6", btn_side7: "Side 7",
+    btn_side8: "Side 8", btn_side9: "Side 9", btn_scrollup: "Wheel up",
+    btn_scrolldown: "Wheel down", act_dpi: "DPI switch", act_disabled: "Disabled",
+    act_button6: "Button 6", act_button7: "Button 7", act_button8: "Button 8",
+    act_button9: "Button 9", act_scrollup: "Wheel up", act_scrolldown: "Wheel down",
+  },
+  ru: {
+    save: "Сохранить", deletebt: "Удалить", profiles: "Профили", docs: "Документация",
+    revert: "Отменить", apply: "Применить", applying: "Применяю…", auto_apply: "Авто-применение",
+    applied: "Применено к мыши: {n} параметров", err_apply: "Ошибка применения: ",
+    profile_saved: "Профиль «{name}» сохранён", profile_deleted: "Профиль «{name}» удалён",
+    profile_loaded: "Профиль «{name}» загружен", profile_n: "Профиль {n}",
+    status_searching: "Поиск мыши…", status_none: "Мышь не найдена",
+    status_none_sub: "подключите мышь", pick_hint: "Текущая модель выделена. Можно посмотреть настройки другой модели, но применять можно только к подключённой.",
+    search_ph: "Поиск модели…", devices_title: "Устройства",
+    devices_sub_none: "Подключите мышь или выберите модель вручную",
+    group_dpi: "DPI И ОПРОС", group_light: "ПОДСВЕТКА", group_power: "ПИТАНИЕ",
+    group_buttons: "КНОПКИ", group_other: "ПРОЧЕЕ",
+    nav_devices: "Устройство", nav_dpi: "DPI и опрос", nav_light: "Подсветка",
+    nav_power: "Питание", nav_buttons: "Кнопки", nav_other: "Прочее",
+    preset: "Пресет {n}", off_label: "выкл", unit_min: " мин", unit_sec: " с",
+    effect_steady: "Постоянный", effect_breath: "Дыхание", effect_breath_slow: "Дыхание (медл.)",
+    effect_breath_fast: "Дыхание (быстр.)", effect_rainbow_shift: "Радуга (сдвиг)",
+    effect_rainbow_breath: "Радуга (пульс)", effect_disco: "Диско",
+    effect_reactive: "Реактивная", effect_rainbow: "Радуга",
+    effect_reactive_rainbow: "Реактивная радуга", effect_off: "Выключено",
+    btn_left: "Левая кнопка", btn_right: "Правая кнопка", btn_middle: "Средняя кнопка",
+    btn_back: "Назад", btn_forward: "Вперёд", btn_side6: "Боковая 6", btn_side7: "Боковая 7",
+    btn_side8: "Боковая 8", btn_side9: "Боковая 9", btn_scrollup: "Колесо вверх",
+    btn_scrolldown: "Колесо вниз", act_dpi: "Смена DPI", act_disabled: "Отключена",
+    act_button6: "Кнопка 6", act_button7: "Кнопка 7", act_button8: "Кнопка 8",
+    act_button9: "Кнопка 9", act_scrollup: "Колесо вверх", act_scrolldown: "Колесо вниз",
+  },
+};
+
+const LABEL_RU = {
   sensitivity: "Чувствительность (DPI)",
   polling_rate: "Частота опроса",
   sleep_timer: "Таймер сна",
@@ -28,7 +93,7 @@ const RU = {
   speed: "Скорость",
 };
 
-const RU_DESC = {
+const DESC_RU = {
   sensitivity: "До пяти предустановок, переключаются кнопкой смены DPI на мыши",
   polling_rate: "Как часто мышь отправляет данные компьютеру",
   z1_color: "Цвет верхней зоны подсветки",
@@ -45,19 +110,26 @@ const RU_DESC = {
   light_effect: "Эффект анимации подсветки",
 };
 
-const GROUPS = [
-  { id: "dpi", title: "DPI и опрос", match: ["sensitivity", "polling_rate"] },
-  { id: "light", title: "Подсветка", match: ["color", "light", "rainbow", "gradient", "reactive", "logo", "strip", "z1", "z2", "z3", "z4"] },
-  { id: "power", title: "Питание", match: ["sleep", "dim", "battery", "idle"] },
-  { id: "buttons", title: "Кнопки", match: ["buttons", "button"] },
-];
-
-const EFFECT_LABELS = {
-  steady: "Постоянный", breath: "Дыхание", "breath-slow": "Дыхание (медл.)",
-  "breath-fast": "Дыхание (быстр.)", "rainbow-shift": "Радуга (сдвиг)",
-  "rainbow-breath": "Радуга (пульс)", disco: "Диско", reactive: "Реактивная",
-  rainbow: "Радуга", "reactive-rainbow": "Реактивная радуга", off: "Выключено",
+const EFFECT_EN = {
+  steady: "Steady", breath: "Breath", "breath-slow": "Breath (slow)",
+  "breath-fast": "Breath (fast)", "rainbow-shift": "Rainbow (shift)",
+  "rainbow-breath": "Rainbow (pulse)", disco: "Disco", reactive: "Reactive",
+  rainbow: "Rainbow", "reactive-rainbow": "Reactive rainbow", off: "Off",
 };
+
+function effectLabel(v) {
+  if (lang === "ru") {
+    return UI.ru["effect_" + v.replace(/-/g, "_")] || v;
+  }
+  return EFFECT_EN[v] || v;
+}
+
+const GROUPS = [
+  { id: "dpi", match: ["sensitivity", "polling_rate"] },
+  { id: "light", match: ["color", "light", "rainbow", "gradient", "reactive", "logo", "strip", "z1", "z2", "z3", "z4"] },
+  { id: "power", match: ["sleep", "dim", "battery", "idle"] },
+  { id: "buttons", match: ["buttons", "button"] },
+];
 
 /* ---------- state ---------- */
 
@@ -210,19 +282,34 @@ function groupFor(key) {
   return "other";
 }
 
-const GROUP_TITLES = {
+const LABEL_RU_GROUPS = {
   dpi: "DPI И ОПРОС", light: "ПОДСВЕТКА", power: "ПИТАНИЕ",
   buttons: "КНОПКИ", other: "ПРОЧЕЕ",
 };
 
+function groupTitle(gid) {
+  if (lang === "ru") {
+    return LABEL_RU_GROUPS[gid] || gid;
+  }
+  return t("group_" + gid);
+}
+
 function labelFor(entry, key, schema) {
-  if (RU[key]) return RU[key];
+  if (lang === "ru") {
+    if (LABEL_RU[key]) return LABEL_RU[key];
+  }
   if (/_?color$/.test(key)) return key.replace(/_?color$/, "").replace(/_/g, " ");
   return schema.label || key.replace(/_/g, " ");
 }
 
 function descFor(key, schema) {
-  if (RU_DESC[key]) return RU_DESC[key];
+  if (lang === "ru") {
+    if (DESC_RU[key]) return DESC_RU[key];
+    return null; // английские описания профилей в русской локали не показываем
+  }
+  if (schema.description) {
+    return schema.description.replace(/buttonsX/, "buttons").replace(/\s*\(default:.*\)\s*$/i, "");
+  }
   return null; // английские описания профилей не показываем
 }
 
@@ -245,8 +332,8 @@ function render(entry) {
   $("auto-apply").closest(".auto-apply").hidden = !showSettings;
   renderNav();
   if (isDevicePage) {
-    $("page-title").textContent = "Устройства";
-    $("page-sub").textContent = state.device ? state.device.name : "Подключите мышь или выберите модель вручную";
+    $("page-title").textContent = t("devices_title");
+    $("page-sub").textContent = state.device ? state.device.name : t("devices_sub_none");
     buildPicker();
     return;
   }
@@ -270,7 +357,7 @@ function render(entry) {
     section.className = "group";
     const title = document.createElement("div");
     title.className = "group-title";
-    title.textContent = GROUP_TITLES[gid];
+    title.textContent = groupTitle(gid);
     section.appendChild(title);
     const card = document.createElement("div");
     card.className = "card";
@@ -309,7 +396,7 @@ function renderRow(entry, key, schema) {
   ctrl.className = "row-control";
 
   if (t === "choice") {
-    ctrl.appendChild(segmented(schema.choices, EFFECT_LABELS, state.values[key], (val) => {
+    ctrl.appendChild(segmented(schema.choices, effectLabel, state.values[key], (val) => {
       state.values[key] = val;
       userChanged();
     }));
@@ -380,8 +467,8 @@ function rangeControl(schema, current, onChange) {
 }
 
 function rangeUnit(schema) {
-  if (schema.cli.includes("-T")) return " с";
-  if (schema.cli.includes("-t")) return " мин";
+  if (schema.cli.includes("-T")) return t("unit_sec");
+  if (schema.cli.includes("-t")) return t("unit_min");
   return "";
 }
 
@@ -410,7 +497,7 @@ function reactiveControl(val, onChange) {
   const cb = document.createElement("input");
   cb.type = "checkbox";
   cb.checked = val.off;
-  offLabel.append(cb, document.createTextNode("выкл"));
+  offLabel.append(cb, document.createTextNode(t("off_label")));
   const picker = document.createElement("input");
   picker.type = "color";
   picker.value = val.hex;
@@ -440,7 +527,7 @@ function dpiEditor(schema, values, onChange) {
     row.className = "dpi-row";
     const name = document.createElement("div");
     name.className = "dpi-name";
-    name.textContent = `Пресет ${i + 1}`;
+    name.textContent = t("preset").replace("{n}", i + 1);
     const slider = document.createElement("input");
     slider.type = "range";
     slider.min = min; slider.max = max; slider.step = step || 100;
@@ -461,17 +548,17 @@ function dpiEditor(schema, values, onChange) {
 
 function buttonsEditor(schema, map, onChange) {
   const labels = {
-    button1: "ЛКМ", button2: "ПКМ", button3: "СКМ",
-    button4: "Назад", button5: "Вперёд", button6: "Кнопка 6",
-    button7: "Кнопка 7", button8: "Кнопка 8", button9: "Кнопка 9",
-    scrollup: "Колесо вверх", scrolldown: "Колесо вниз",
-    disabled: "Отключена",
+    button1: t("btn_left"), button2: t("btn_right"), button3: t("btn_middle"),
+    button4: t("btn_back"), button5: t("btn_forward"), button6: t("act_button6"),
+    button7: t("act_button7"), button8: t("act_button8"), button9: t("act_button9"),
+    scrollup: t("act_scrollup"), scrolldown: t("act_scrolldown"),
+    disabled: t("act_disabled"),
   };
   const physNames = {
-    button1: "Левая кнопка", button2: "Правая кнопка", button3: "Средняя кнопка",
-    button4: "Назад", button5: "Вперёд", button6: "Боковая 6",
-    button7: "Боковая 7", button8: "Боковая 8", button9: "Боковая 9",
-    scrollup: "Колесо вверх", scrolldown: "Колесо вниз",
+    button1: t("btn_left"), button2: t("btn_right"), button3: t("btn_middle"),
+    button4: t("btn_back"), button5: t("btn_forward"), button6: t("btn_side6"),
+    button7: t("btn_side7"), button8: t("btn_side8"), button9: t("btn_side9"),
+    scrollup: t("btn_scrollup"), scrolldown: t("btn_scrolldown"),
   };
   const opts = ["button1", "button2", "button3", "button4", "button5", "button6", "button7", "button8", "button9", "scrollup", "scrolldown", "dpi", "disabled"];
   const wrap = document.createElement("div");
@@ -533,17 +620,17 @@ async function apply() {
   if (!state.device) return;
   const args = buildArgs(state.device);
   if (!args.length) return;
-  $("btn-apply").textContent = "Применяю…";
+  $("btn-apply").textContent = t("applying");
   $("btn-apply").disabled = true;
   const res = await bridge({ op: "run", args });
-  $("btn-apply").textContent = "Применить";
+  $("btn-apply").textContent = t("apply");
   if (res.ok) {
     const n = args.filter((a) => a.startsWith("--") || a.startsWith("-")).length;
     state.clean = JSON.parse(JSON.stringify(state.values));
-    toast("Применено к мыши: " + n + " параметров", "ok");
+    toast(t("applied").replace("{n}", n), "ok");
   } else {
     const detail = (res.stderr || res.error || "").split("\n").slice(-2).join(" ").trim();
-    toast("Ошибка применения: " + detail, "err");
+    toast(t("err_apply") + detail, "err");
   }
   updateButtons();
 }
@@ -557,12 +644,12 @@ function revert() {
 /* ---------- device list / picker page ---------- */
 
 const PAGES = [
-  { id: "devices", label: "Устройство" },
-  { id: "dpi", label: "DPI и опрос" },
-  { id: "light", label: "Подсветка" },
-  { id: "power", label: "Питание" },
-  { id: "buttons", label: "Кнопки" },
-  { id: "other", label: "Прочее" },
+  { id: "devices", label: () => t("nav_devices") },
+  { id: "dpi", label: () => t("nav_dpi") },
+  { id: "light", label: () => t("nav_light") },
+  { id: "power", label: () => t("nav_power") },
+  { id: "buttons", label: () => t("nav_buttons") },
+  { id: "other", label: () => t("nav_other") },
 ];
 
 function renderNav() {
@@ -585,7 +672,7 @@ function renderNav() {
     b.className = "nav-item" + (state.page === p.id ? " active" : "");
     const enabled = p.id === "devices" ? state.catalog.length > 0 : state.device && available.has(p.id);
     b.disabled = !enabled;
-    b.textContent = p.label;
+    b.textContent = p.label();
     b.addEventListener("click", () => selectPage(p.id));
     nav.appendChild(b);
   }
@@ -609,12 +696,12 @@ function buildPicker() {
   wrap.innerHTML = "";
   const hint = document.createElement("div");
   hint.className = "picker-hint";
-  hint.textContent = state.device ? "Текущая модель выделена. Можно посмотреть настройки другой модели, но применять можно только к подключённой." : "";
+  hint.textContent = state.device ? t("pick_hint") : "";
   const search = document.createElement("input");
   search.className = "search";
   search.id = "device-search";
   search.type = "search";
-  search.placeholder = "Поиск модели…";
+  search.placeholder = t("search_ph");
   const list = document.createElement("div");
   list.className = "device-list device-list-page";
   list.id = "device-list";
@@ -690,7 +777,7 @@ async function detectLoop(first) {
   }
   if (first || (state.device && !lastDetect.some((d) => d.product_id === state.device.product_id))) {
     if (!state.device) {
-      setStatus("err", "Мышь не найдена", "подключите мышь");
+      setStatus("err", t("status_none"), t("status_none_sub"));
     }
   }
 }
@@ -733,25 +820,26 @@ async function saveProfile() {
   if (!state.device) return;
   const sel = $("profile-select");
   const existing = sel.value;
-  const name = existing || "Профиль " + (sel.options.length);
+  const name = existing || t("profile_n").replace("{n}", sel.options.length);
   const key = profileKey();
   const store = JSON.parse(localStorage.getItem(key) || "{}");
   store[name] = JSON.parse(JSON.stringify(state.values));
   localStorage.setItem(key, JSON.stringify(store));
   refreshProfiles();
   sel.value = name;
-  toast(`Профиль «${name}» сохранён`, "ok");
+  toast(t("profile_saved").replace("{name}", name), "ok");
 }
 
 function deleteProfile() {
   const sel = $("profile-select");
   const key = profileKey();
   if (!key || !sel.value) return;
+  const removed = sel.value;
   const store = JSON.parse(localStorage.getItem(key) || "{}");
-  delete store[sel.value];
+  delete store[removed];
   localStorage.setItem(key, JSON.stringify(store));
   refreshProfiles();
-  toast(`Профиль «${sel.value}» удалён`);
+  toast(t("profile_deleted").replace("{name}", removed));
 }
 
 function loadProfile(name) {
@@ -761,7 +849,39 @@ function loadProfile(name) {
   if (!store[name]) return;
   state.values = JSON.parse(JSON.stringify(store[name]));
   render(state.device);
-  toast(`Профиль «${name}» загружен`, "ok");
+  toast(t("profile_loaded").replace("{name}", name), "ok");
+}
+
+/* ---------- i18n: static translation + switcher ---------- */
+
+function translateStatic() {
+  document.documentElement.lang = lang;
+  $("profiles-label").textContent = t("profiles");
+  $("profile-save").textContent = t("save");
+  $("profile-delete").textContent = t("deletebt");
+  $("btn-docs").textContent = t("docs");
+  $("btn-revert").textContent = t("revert");
+  $("btn-apply").textContent = t("apply");
+  document.querySelector(".auto-apply span").textContent = t("auto_apply");
+  refreshProfiles();
+  renderNav();
+}
+
+function initLang() {
+  const sel = $("lang-select");
+  sel.value = lang;
+  sel.addEventListener("change", () => {
+    lang = sel.value;
+    localStorage.setItem("lang", lang);
+    translateStatic();
+    if (state.page === "devices") {
+      render(null);
+      renderDeviceList($("device-search") ? $("device-search").value : "");
+    } else if (state.device) {
+      render(state.device);
+    }
+    if (!state.device) setStatus("", t("status_searching"), " ");
+  });
 }
 
 /* ---------- theme ---------- */
@@ -785,9 +905,10 @@ function initTheme() {
 
 async function boot() {
   initTheme();
+  initLang();
   const cat = await bridge({ op: "devices" });
   state.catalog = cat.catalog || [];
-  if (!state.device) setStatus("", "Поиск мыши…", " ");
+  if (!state.device) setStatus("", t("status_searching"), " ");
   render(null);
   detectLoop(true);
   setInterval(() => detectLoop(false), 4000);

@@ -73,6 +73,9 @@ body { display: flex; overflow: hidden; }
 .nav-item.active::before { content: ""; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); margin-right: 9px; vertical-align: middle; position: relative; top: -1px; }
 .nav-item:disabled { opacity: 0.35; cursor: default; }
 .side-section-bottom { margin-top: auto; }
+.side-section-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.select-inline { width: auto; padding: 4px 8px; font-size: 11.5px; flex-shrink: 0; }
+.side-section-bottom .side-label { flex: 1; }
 
 /* ---------- device picker page ---------- */
 .picker { display: flex; flex-direction: column; gap: 14px; max-width: 860px; }

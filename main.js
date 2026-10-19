@@ -74,7 +74,7 @@ function createWindow() {
   win.loadFile(path.join(__dirname, "src", "index.html"));
   setTimeout(() => {
     win.webContents.executeJavaScript(
-      "(async () => { const out = {}; const main = document.querySelector('.main'); const order = ['dpi','light','power','buttons']; for (const p of order) { selectPage(p); await new Promise(r => setTimeout(r, 80)); out[p] = main.scrollHeight - main.clientHeight; } selectPage('dpi'); return JSON.stringify(out); })()"
+      "(async () => { const out = {}; out.langDefault = localStorage.getItem('lang') || 'en'; out.enNav = document.querySelector('.nav-item').textContent; out.enApply = document.getElementById('btn-apply').textContent; document.getElementById('lang-select').value = 'ru'; document.getElementById('lang-select').dispatchEvent(new Event('change')); await new Promise(r => setTimeout(r, 150)); out.ruNav = document.querySelector('.nav-item').textContent; out.ruApply = document.getElementById('btn-apply').textContent; out.ruGroup = document.querySelector('.group-title') ? document.querySelector('.group-title').textContent : '?'; document.getElementById('lang-select').value = 'en'; document.getElementById('lang-select').dispatchEvent(new Event('change')); await new Promise(r => setTimeout(r, 100)); out.backNav = document.querySelector('.nav-item').textContent; return JSON.stringify(out); })()"
     ).then((r) => console.log("[probe]", r)).catch((e) => console.error("[probe-err]", String(e)));
   }, 6000);
   return win;
