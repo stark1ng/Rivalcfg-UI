@@ -1,0 +1,14 @@
+{
+  "name": "rivalcfgui",
+  "productName": "RivalCFG UI",
+  "version": "0.1.0",
+  "description": "Data-driven GUI for rivalcfg — configure every supported SteelSeries mouse",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^33.0.0"
+  }
+}
