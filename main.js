@@ -74,7 +74,7 @@ function createWindow() {
   win.loadFile(path.join(__dirname, "src", "index.html"));
   setTimeout(() => {
     win.webContents.executeJavaScript(
-      "JSON.stringify({items: document.querySelectorAll('.device-item').length, rows: [...document.querySelectorAll('.buttons-row')].map(r => { const s = getComputedStyle(r); return r.getBoundingClientRect().height + '|' + s.display; }), ruDesc: document.body.innerText.includes('Переназначение кнопок'), autoApply: !!document.getElementById('auto-apply')})"
+      "(async () => { selectPage('devices'); await new Promise(r => setTimeout(r, 120)); const items = document.querySelectorAll('.device-item').length; selectPage('light'); await new Promise(r => setTimeout(r, 120)); const rows = document.querySelectorAll('.row').length; const active = (document.querySelector('.nav-item.active') || {}).textContent || '?'; return JSON.stringify({items, lightRows: rows, active}); })()"
     ).then((r) => console.log("[probe]", r)).catch((e) => console.error("[probe-err]", String(e)));
   }, 6000);
   return win;

@@ -25,7 +25,7 @@
       </button>
     </div>
 
-    <section class="side-card" id="device-status">
+    <section class="side-card side-card-click" id="device-status" role="button" tabindex="0" title="Перейти к выбору устройства">
       <div class="status-dot" id="status-dot"></div>
       <div class="status-text">
         <div class="status-title" id="status-name">Поиск мыши…</div>
@@ -33,13 +33,9 @@
       </div>
     </section>
 
-    <section class="side-section">
-      <div class="side-label">Устройство</div>
-      <input class="search" id="device-search" type="search" placeholder="Поиск…" />
-      <div class="device-list" id="device-list"></div>
-    </section>
+    <nav class="side-nav" id="side-nav" aria-label="Разделы настроек"></nav>
 
-    <section class="side-section">
+    <section class="side-section side-section-bottom">
       <div class="side-label">Профили</div>
       <select class="select" id="profile-select"><option value="">—</option></select>
       <div class="side-actions">
@@ -52,8 +48,8 @@
   <main class="main">
     <header class="topbar">
       <div>
-        <h1 class="page-title" id="page-title">Мышь не выбрана</h1>
-        <div class="page-sub" id="page-sub">Выберите устройство слева</div>
+        <h1 class="page-title" id="page-title">Устройства</h1>
+        <div class="page-sub" id="page-sub">&nbsp;</div>
       </div>
       <div class="topbar-actions">
         <a class="btn" id="btn-docs" href="#" hidden target="_blank" rel="noreferrer">Документация</a>

@@ -67,6 +67,7 @@ const state = {
   values: {},          // parsed UI values per setting key
   clean: {},           // baseline to diff against
   periodId: null,
+  page: "devices",     // devices | dpi | light | power | buttons | other
 };
 
 const $ = (id) => document.getElementById(id);
@@ -228,19 +229,31 @@ function descFor(key, schema) {
 function render(entry) {
   const root = $("settings");
   root.innerHTML = "";
-  $("page-title").textContent = entry.name;
-  $("page-sub").textContent = `USB 1038:${entry.product_id}`;
   const docs = $("btn-docs");
-  if (entry.docs_url) {
+  const isDevicePage = state.page === "devices";
+  const showSettings = Boolean(entry) && !isDevicePage;
+  docs.hidden = !entry || !entry.docs_url || isDevicePage;
+  if (entry && entry.docs_url) {
     docs.href = "#";
-    docs.hidden = false;
     docs.onclick = (ev) => {
       ev.preventDefault();
       window.rivalui.openExternal(entry.docs_url);
     };
-  } else {
-    docs.hidden = true;
   }
+  $("btn-apply").hidden = !showSettings;
+  $("btn-revert").hidden = !showSettings;
+  $("auto-apply").closest(".auto-apply").hidden = !showSettings;
+  renderNav();
+  if (isDevicePage) {
+    $("page-title").textContent = "Устройства";
+    $("page-sub").textContent = state.device ? state.device.name : "Подключите мышь или выберите модель вручную";
+    buildPicker();
+    return;
+  }
+  if (!showSettings) return;
+
+  $("page-title").textContent = entry.name;
+  $("page-sub").textContent = `USB 1038:${entry.product_id}`;
 
   const buckets = {};
   for (const [key, schema] of Object.entries(entry.settings)) {
@@ -250,8 +263,8 @@ function render(entry) {
     (buckets[g] = buckets[g] || []).push([key, schema]);
   }
 
-  // strip_colors pseudo-grouping: show colors in their natural order (z1..z4)
-  for (const gid of ["dpi", "light", "power", "buttons", "other"]) {
+  const sections = state.page === "all" ? ["dpi", "light", "power", "buttons", "other"] : [state.page];
+  for (const gid of sections) {
     if (!buckets[gid]) continue;
     const section = document.createElement("section");
     section.className = "group";
@@ -541,10 +554,79 @@ function revert() {
   render(state.device);
 }
 
-/* ---------- device list ---------- */
+/* ---------- device list / picker page ---------- */
+
+const PAGES = [
+  { id: "devices", label: "Устройство" },
+  { id: "dpi", label: "DPI и опрос" },
+  { id: "light", label: "Подсветка" },
+  { id: "power", label: "Питание" },
+  { id: "buttons", label: "Кнопки" },
+  { id: "other", label: "Прочее" },
+];
+
+function renderNav() {
+  const nav = $("side-nav");
+  nav.innerHTML = "";
+  const available = state.device
+    ? new Set(
+        Object.entries(state.device.settings)
+          .map(([k, s]) =>
+            ["multidpi_range_choice", "multidpi_range", "choice", "range", "rgbcolor", "reactive_rgbcolor", "buttons", "none"].includes(s.value_type)
+              ? groupFor(k)
+              : null
+          )
+          .filter(Boolean)
+      )
+    : new Set();
+  for (const p of PAGES) {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "nav-item" + (state.page === p.id ? " active" : "");
+    const enabled = p.id === "devices" ? state.catalog.length > 0 : state.device && available.has(p.id);
+    b.disabled = !enabled;
+    b.textContent = p.label;
+    b.addEventListener("click", () => selectPage(p.id));
+    nav.appendChild(b);
+  }
+}
+
+function selectPage(page) {
+  state.page = page;
+  $("settings").scrollTop = 0;
+  if (page === "devices") {
+    render(null);
+    renderDeviceList((document.getElementById("device-search") || {}).value || "");
+  } else if (state.device) {
+    render(state.device);
+  }
+}
+
+function buildPicker() {
+  const root = $("settings");
+  const wrap = document.createElement("div");
+  wrap.className = "picker";
+  wrap.innerHTML = "";
+  const hint = document.createElement("div");
+  hint.className = "picker-hint";
+  hint.textContent = state.device ? "Текущая модель выделена. Можно посмотреть настройки другой модели, но применять можно только к подключённой." : "";
+  const search = document.createElement("input");
+  search.className = "search";
+  search.id = "device-search";
+  search.type = "search";
+  search.placeholder = "Поиск модели…";
+  const list = document.createElement("div");
+  list.className = "device-list device-list-page";
+  list.id = "device-list";
+  search.addEventListener("input", () => renderDeviceList(search.value));
+  wrap.append(hint, search, list);
+  root.appendChild(wrap);
+  renderDeviceList("");
+}
 
 function renderDeviceList(filter) {
   const list = $("device-list");
+  if (!list) return;
   list.innerHTML = "";
   const q = (filter || "").toLowerCase();
   const entries = state.catalog.filter((e) => !q || e.name.toLowerCase().includes(q));
@@ -572,9 +654,14 @@ function selectDevice(entry) {
   if (!entry) return;
   state.device = entry;
   parseInitial(entry);
-  render(entry);
+  if (state.page === "devices") {
+    // после выбора модели показываем первую доступную категорию настроек
+    const order = ["dpi", "light", "power", "buttons", "other"];
+    const first = order.find((g) => Object.keys(entry.settings).some((k) => groupFor(k) === g));
+    state.page = first || "other";
+  }
+  render(state.device);
   setStatus("ok", entry.name, `1038:${entry.product_id}`);
-  renderDeviceList($("device-search").value);
 }
 
 function setStatus(kind, title, sub) {
@@ -636,6 +723,10 @@ function refreshProfiles() {
   }
   if (Object.keys(store).length === 0) sel.appendChild(empty);
   sel.disabled = Object.keys(store).length === 0;
+  $("profile-delete").disabled = sel.value === "";
+  sel.addEventListener("change", () => {
+    $("profile-delete").disabled = sel.value === "";
+  });
 }
 
 async function saveProfile() {
@@ -696,11 +787,25 @@ async function boot() {
   initTheme();
   const cat = await bridge({ op: "devices" });
   state.catalog = cat.catalog || [];
-  renderDeviceList("");
+  if (!state.device) setStatus("", "Поиск мыши…", " ");
+  render(null);
   detectLoop(true);
   setInterval(() => detectLoop(false), 4000);
 
-  $("device-search").addEventListener("input", (e) => renderDeviceList(e.target.value));
+  const statusCard = $("device-status");
+  statusCard.addEventListener("click", () => {
+    state.page = "devices";
+    render(null);
+    renderDeviceList("");
+  });
+  statusCard.addEventListener("keydown", (ev) => {
+    if (ev.key === "Enter" || ev.key === " ") {
+      ev.preventDefault();
+      state.page = "devices";
+      render(null);
+      renderDeviceList("");
+    }
+  });
   $("btn-apply").addEventListener("click", apply);
   $("btn-revert").addEventListener("click", revert);
   $("profile-save").addEventListener("click", saveProfile);
